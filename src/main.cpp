@@ -16,6 +16,7 @@
 #include <moustache.h>
 #include <settings.h>
 
+#include <ESP32Servo.h>
 // HTML files
 extern const char index_html_min_start[] asm("_binary_html_index_min_html_start");
 
@@ -54,6 +55,9 @@ DNSServer dnsServer;
 std::unique_ptr<rtsp_server> camera_server;
 // Web server
 WebServer web_server(80);
+//servo support
+Servo pan;
+Servo Tilt;
 
 auto thingName = String(WIFI_SSID) + "-" + String(ESP.getEfuseMac(), 16);
 IotWebConf iotWebConf(thingName.c_str(), &dnsServer, &web_server, WIFI_PASSWORD, CONFIG_VERSION);
@@ -230,6 +234,18 @@ void handle_restart()
 	ESP.restart();
 }
 
+void handle_pan(int angle)
+{
+	pan.write(pan.read()+angle);
+	log_v("panned " + angle + " degrees";
+}
+
+void handle_tilt(int angle)
+{
+	tilt.write(pan.read+angle);
+	log_v("tilted " + angle + " degrees";
+}
+
 esp_err_t initialize_camera()
 {
   log_v("initialize_camera");
@@ -357,6 +373,9 @@ void setup()
   analogWrite(FLASH_LED_GPIO, 0);
 #endif
 
+pan.attach(12);  // attaches the servo on ESP32 pin
+tilt.attach(13);
+
 #ifdef ARDUINO_USB_CDC_ON_BOOT
   // Delay for USB to connect/settle
   delay(5000);
@@ -438,6 +457,11 @@ void setup()
   web_server.on("/restart", HTTP_GET, handle_restart);
   web_server.onNotFound([]()
                         { iotWebConf.handleNotFound(); });
+
+	web_server.on("/left", HTTP_GET, handle_pan(10));
+	web_server.on("/right", HTTP_GET, handle_pan(-10));
+	web_server.on("/up", HTTP_GET, handle_tilt(10));
+	web_server.on("/down", HTTP_GET, handle_tilt(-10));
 }
 
 void loop()
