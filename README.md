@@ -3,6 +3,7 @@
 [![Platform IO CI](https://github.com/rzeldent/esp32cam-rtsp/actions/workflows/main.yml/badge.svg)](https://github.com/rzeldent/esp32cam-rtsp/actions/workflows/main.yml)
 
 Simple [RTSP](https://en.wikipedia.org/wiki/Real_Time_Streaming_Protocol), [HTTP JPEG Streamer](https://en.wikipedia.org/wiki/Motion_JPEG) and image server with configuration through the web interface.
+Now with Pan-Zoom support
 
 > [!IMPORTANT]  
 > New branch available! Here [branch: develop](https://github.com/rzeldent/esp32cam-rtsp/tree/develop)
@@ -83,6 +84,8 @@ The software provides a **configuration web server**, that can be used to:
   - Vertical flip
   - Downside enable
   - Color bar
+- Pan
+- Tilt
 
 The software provides contains also a mDNS server to be easily discoverable on the local network.
 It advertises HTTP (port 80) and RTSP (port 554)
@@ -91,7 +94,8 @@ It advertises HTTP (port 80) and RTSP (port 554)
 
 - ESP32-CAM module or similar,
 - USB to Serial (TTL level) converter, piggyback board ESP32-CAM-MB or other way to connect to the device,
-- [**PlatformIO**](https://platformio.org/) software (free download)
+- [**PlatformIO**](https://platformio.org/) software (free download),
+- two servo motors
 
 ## Boards
 
@@ -278,6 +282,10 @@ Calling this URL will start the form for configuring the device in the browser. 
 Calling this URL will return a JPEG snapshot of the camera in the browser.
 This request can also be used (for example using cURL) to save the snapshot to a file.
 
+### GET: /left-/right or /up-/down
+
+Calling this URL reads the current position of the pan/tilt servo and +- 10 deg.
+
 ## Issues / Nice to know
 
 - The red LED on the back of the device indicates the device is not connected.
@@ -297,6 +305,12 @@ This request can also be used (for example using cURL) to save the snapshot to a
 - There are modules that have no or faulty PSRAM (despite advertised as such).
   This can be the case if the camera fails to initialize.
   It might help to disable the use of the PSRAM and reduce the buffers and the screen size.
+
+### TODO
+
+- test
+- send new position to client
+- frigate plugin for client side control and position tracking
 
 ### Power
 
@@ -359,7 +373,9 @@ Make sure it is connected the right way around (Camera pointing away from the bo
 esp32cam-rtsp depends on PlatformIO, Bootstrap 5 and Micro-RTSP by Kevin Hester.
 
 ## Change history
-
+- Mar 2026 
+  - pt support, unsure of implementing zoom
+  - entirely untested, will likely have to revise
 - August 2024
   - Added support for M5Stack M5PoECAM-W
 - January 2024
